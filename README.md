@@ -19,7 +19,7 @@
     "lastName": "Volf",
     "dateOfBirth": "1998-09-25",
     "personalNumber": 1,
-    "isActive": false
+    "isActive": true
 }
 ````
 #### DELETE: http://localhost:8081/api/employees/1
