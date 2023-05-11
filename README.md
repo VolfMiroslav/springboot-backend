@@ -1,5 +1,13 @@
 # Actis ukázkový projekt
 
+### Databáze:
+PostgreSQL. Nutnost vytvořit databázi employees. Porty nejsou nastavené na defaultní hodnoty, tedy je také bude nutnost změnit.
+Změnit CrossOrigin v:
+
+    src/main
+        java/springboot
+            controller 
+                EmployeeController.java
 #### Pro testování API:
 #### POST: http://localhost:8081/api/employees
 ````
