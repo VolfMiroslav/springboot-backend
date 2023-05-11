@@ -22,6 +22,15 @@ public class Employee {
     public Employee() {
 
     }
+
+    /**
+     * Constructor method. Takes all parameters needed to create an employee
+     * @param firstName First name of employee
+     * @param lastName Last
+     * @param dateOfBirth
+     * @param personalNumber
+     * @param isActive
+     */
     public Employee(String firstName, String lastName, Date dateOfBirth,
                     Integer personalNumber, Boolean isActive) {
         this.firstName = firstName;

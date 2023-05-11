@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,58 +21,72 @@ import org.springframework.web.bind.annotation.RestController;
 import springboot.exception.ResourceNotFoundException;
 import springboot.model.Employee;
 import springboot.repository.EmployeeRepository;
+import springboot.service.EmployeeService;
 
-@CrossOrigin(origins = "http://localhost:8081")
+/**
+ * CrossOrigin values are for database and frontend.
+ */
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:8082"})
 @RestController
 @RequestMapping("/api")
 public class EmployeeController {
+    private final EmployeeService employeeService;
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
-
-    // get all employees
+    /**
+     * Gets all employees.
+     * @return OK and all employees.
+     */
     @GetMapping("/employees")
-    public List<Employee> getAllEmployees(){
-        return (List<Employee>) employeeRepository.findAll();
+    public ResponseEntity<List<Employee>> getAllEmployees(){
+        List<Employee> employees = employeeService.getAllEmployees();
+        return ResponseEntity.ok(employees);
     }
 
-    // create employee rest api
+    /**
+     * Creates an employee.
+     * @param employee Employee object with all parameters filled.
+     * @return HttpStatus Created and the created employee.
+     */
     @PostMapping("/employees")
-    public Employee createEmployee(@RequestBody Employee employee) {
-        return employeeRepository.save(employee);
+    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
+        Employee savedEmployee = employeeService.saveEmployee(employee);
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
     }
 
-    // get employee by id rest api
+    /**
+     * Gets employee with the given ID.
+     * @param id ID of employee.
+     * @return OK and employee.
+     */
     @GetMapping("/employees/{id}")
     public ResponseEntity<Employee> getEmployeeById(@PathVariable Integer id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zaměstnanec neexistuje s tímto ID:" + id));
+        Employee employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
 
-    // update employee rest api
+    /**
+     * Updates employee with the given ID.
+     * @param id ID of employee.
+     * @param employeeDetails Employee object with all parameters filled.
+     * @return OK and updated Employee.
+     */
     @PutMapping("/employees/{id}")
     public ResponseEntity<Employee> updateEmployee(@PathVariable Integer id, @RequestBody Employee employeeDetails){
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zaměstnanec neexistuje s tímto ID:" + id));
-
-        employee.setFirstName(employeeDetails.getFirstName());
-        employee.setLastName(employeeDetails.getLastName());
-        employee.setDateOfBirth(employeeDetails.getDateOfBirth());
-        employee.setPersonalNumber(employeeDetails.getPersonalNumber());
-        employee.setIsActive(employeeDetails.getIsActive());
-
-        Employee updatedEmployee = employeeRepository.save(employee);
+        Employee updatedEmployee = employeeService.updateEmployee(id, employeeDetails);
         return ResponseEntity.ok(updatedEmployee);
     }
 
-    // delete employee rest api
+    /**
+     * Deletes employee with the given ID.
+     * @param id ID of employee.
+     * @return OK if deleted.
+     */
     @DeleteMapping("/employees/{id}")
     public ResponseEntity<Map<String, Boolean>> deleteEmployee(@PathVariable Integer id){
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Zaměstnanec neexistuje s tímto ID:" + id));
-
-        employeeRepository.delete(employee);
+        employeeService.deleteEmployee(id);
         Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return ResponseEntity.ok(response);
